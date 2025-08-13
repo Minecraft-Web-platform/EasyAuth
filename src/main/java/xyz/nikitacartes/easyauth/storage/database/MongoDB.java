@@ -3,6 +3,7 @@ package xyz.nikitacartes.easyauth.storage.database;
 import com.mongodb.MongoClientException;
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.InsertOneModel;
 import net.minecraft.util.Uuids;
 import org.bson.Document;
@@ -56,6 +57,22 @@ public class MongoDB implements DbApi {
             collection.insertOne(document);
         } catch (MongoCommandException e) {
             LogError("Failed to insert data into MongoDB: " + data, e);
+        }
+    }
+
+    @Override
+    public void createConfirmationCodesTable() {
+        try {
+            if (!collection.getNamespace().getCollectionName().equals("confirmation_codes")) {
+                MongoDatabase database = mongoClient.getDatabase("my_database");
+                MongoCollection<Document> codesCollection = database.getCollection("confirmation_codes");
+
+                codesCollection.createIndex(Indexes.ascending("player_uuid"));
+
+                this.collection = codesCollection;
+            }
+        } catch (MongoCommandException e) {
+            e.printStackTrace();
         }
     }
 

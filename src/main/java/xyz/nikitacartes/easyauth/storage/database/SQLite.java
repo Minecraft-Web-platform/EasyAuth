@@ -91,6 +91,28 @@ public class SQLite implements DbApi {
         }
     }
 
+    public void createConfirmationCodesTable() {
+        String sql = """
+        CREATE TABLE IF NOT EXISTS confirmation_codes (
+            id TEXT PRIMARY KEY,
+            player_uuid TEXT NOT NULL,
+            code TEXT,
+            type TEXT,
+            used INTEGER DEFAULT 0,
+            expires_at TEXT,
+            FOREIGN KEY (player_uuid) REFERENCES users(uuid) ON DELETE CASCADE
+        )
+    """;
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:mydatabase.db");
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public @Nullable PlayerEntryV1 getUserData(String username) {
         try {

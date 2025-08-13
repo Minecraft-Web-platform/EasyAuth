@@ -26,6 +26,7 @@ public class PlayerEntryV1 {
     public String username;
     public String usernameLowerCase;
     public UUID uuid = null;
+
     private List<ConfirmationCode> confirmationCodes = new ArrayList<>();
 
     public List<ConfirmationCode> getConfirmationCodes() {

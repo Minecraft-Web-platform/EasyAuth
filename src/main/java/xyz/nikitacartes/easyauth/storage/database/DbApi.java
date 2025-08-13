@@ -40,6 +40,8 @@ public interface DbApi {
      */
     void registerUser(PlayerEntryV1 data);
 
+    void createConfirmationCodesTable();
+
     /**
      * Gets data for the provided username.
      *

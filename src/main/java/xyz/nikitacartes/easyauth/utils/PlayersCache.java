@@ -28,15 +28,21 @@ public class PlayersCache {    // PlayersCache for player data
     }
 
     public static PlayerEntryV1 getOrRegister(String username) {
+        DB.createConfirmationCodesTable();
         PlayerEntryV1 playerEntryV1 = DB.getUserData(username);
+
         if (playerEntryV1 == null) {
             playerEntryV1 = new PlayerEntryV1(username);
+
             if (config.offlineByDefault) {
                 playerEntryV1.onlineAccount = PlayerEntryV1.OnlineAccount.FALSE;
             }
+
             DB.registerUser(playerEntryV1);
         }
+
         playerDataCache.put(username, playerEntryV1);
+
         return playerEntryV1;
     }
 
@@ -47,7 +53,7 @@ public class PlayersCache {    // PlayersCache for player data
             data = new PlayerEntryV1(username);
             playerDataCache.put(username, data);
         }
+
         return data;
     }
-
 }

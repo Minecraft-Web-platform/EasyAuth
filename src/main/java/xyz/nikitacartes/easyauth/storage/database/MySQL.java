@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
+import static java.sql.DriverManager.getConnection;
 import static xyz.nikitacartes.easyauth.EasyAuth.extendedConfig;
 import static xyz.nikitacartes.easyauth.utils.EasyLogger.*;
 
@@ -34,7 +35,7 @@ public class MySQL implements DbApi {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String uri = "jdbc:mysql://" + config.mysql.mysqlHost + "/" + config.mysql.mysqlDatabase + "?autoReconnect=true";
             LogDebug(String.format("connecting to %s", uri));
-            MySQLConnection = DriverManager.getConnection(uri, config.mysql.mysqlUser, config.mysql.mysqlPassword);
+            MySQLConnection = getConnection(uri, config.mysql.mysqlUser, config.mysql.mysqlPassword);
             PreparedStatement preparedStatement = MySQLConnection.prepareStatement("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?;");
             preparedStatement.setString(1, config.mysql.mysqlTable);
             if (!preparedStatement.executeQuery().next()) {
@@ -143,24 +144,33 @@ public class MySQL implements DbApi {
         }
     }
 
-    public void saveConfirmationCode(UUID playerUuid, ConfirmationCode code) {
+    public void createConfirmationCodesTable() {
         try {
             reConnect();
-            PreparedStatement preparedStatement = MySQLConnection.prepareStatement(
-                    "INSERT INTO confirmation_codes (id, player_uuid, code, type, used, expires_at) VALUES (?, ?, ?, ?, ?, ?);"
-            );
-            preparedStatement.setString(1, code.id);
-            preparedStatement.setString(2, playerUuid.toString());
-            preparedStatement.setString(3, code.code);
-            preparedStatement.setString(4, code.type.name()); // Enum в String
-            preparedStatement.setBoolean(5, code.used);
-            preparedStatement.setString(6, code.expiresAt.toString()); // ISO 8601
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
+            String sql = """
+            CREATE TABLE IF NOT EXISTS confirmation_codes (
+                id CHAR(36) PRIMARY KEY,
+                player_username VARCHAR(255) NOT NULL,
+                code VARCHAR(6),
+                type VARCHAR(32),
+                used BOOLEAN DEFAULT FALSE,
+                expires_at DATETIME,
+                CONSTRAINT fk_player_username
+                    FOREIGN KEY (player_username)
+                    REFERENCES %s(username)
+                    ON DELETE CASCADE
+            ) ENGINE=InnoDB;
+        """.formatted(config.mysql.mysqlTable);
+
+            try (PreparedStatement stmt = MySQLConnection.prepareStatement(sql)) {
+                stmt.executeUpdate();
+            }
         } catch (SQLException e) {
-            LogError("Error saving confirmation code for " + playerUuid, e);
+            e.printStackTrace();
         }
     }
+
+
 
 
     /**
