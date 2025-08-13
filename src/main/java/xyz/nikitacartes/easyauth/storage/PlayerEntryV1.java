@@ -8,6 +8,8 @@ import xyz.nikitacartes.easyauth.event.AuthEventHandler;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -24,6 +26,15 @@ public class PlayerEntryV1 {
     public String username;
     public String usernameLowerCase;
     public UUID uuid = null;
+    private List<ConfirmationCode> confirmationCodes = new ArrayList<>();
+
+    public List<ConfirmationCode> getConfirmationCodes() {
+        return confirmationCodes;
+    }
+
+    public void setConfirmationCodes(List<ConfirmationCode> confirmationCodes) {
+        this.confirmationCodes = confirmationCodes;
+    }
 
     /**
      * Hashed password of player.

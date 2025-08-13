@@ -3,6 +3,7 @@ package xyz.nikitacartes.easyauth.storage.database;
 import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 import net.minecraft.util.Uuids;
 import xyz.nikitacartes.easyauth.config.StorageConfigV1;
+import xyz.nikitacartes.easyauth.storage.ConfirmationCode;
 import xyz.nikitacartes.easyauth.storage.PlayerEntryV1;
 
 import javax.annotation.Nonnull;
@@ -10,6 +11,7 @@ import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 
 import static xyz.nikitacartes.easyauth.EasyAuth.extendedConfig;
 import static xyz.nikitacartes.easyauth.utils.EasyLogger.*;
@@ -140,6 +142,26 @@ public class MySQL implements DbApi {
             LogError("Register error: " + data, e);
         }
     }
+
+    public void saveConfirmationCode(UUID playerUuid, ConfirmationCode code) {
+        try {
+            reConnect();
+            PreparedStatement preparedStatement = MySQLConnection.prepareStatement(
+                    "INSERT INTO confirmation_codes (id, player_uuid, code, type, used, expires_at) VALUES (?, ?, ?, ?, ?, ?);"
+            );
+            preparedStatement.setString(1, code.id);
+            preparedStatement.setString(2, playerUuid.toString());
+            preparedStatement.setString(3, code.code);
+            preparedStatement.setString(4, code.type.name()); // Enum в String
+            preparedStatement.setBoolean(5, code.used);
+            preparedStatement.setString(6, code.expiresAt.toString()); // ISO 8601
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            LogError("Error saving confirmation code for " + playerUuid, e);
+        }
+    }
+
 
     /**
      * Gets data for the provided username.
