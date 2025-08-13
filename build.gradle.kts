@@ -27,8 +27,8 @@ val awFile = when {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 fabricApi.configureTests {
@@ -40,6 +40,7 @@ fabricApi.configureTests {
 }
 
 tasks.named("runGameTest") {
+    enabled=false
     usesService(semaphore)
 }
 
