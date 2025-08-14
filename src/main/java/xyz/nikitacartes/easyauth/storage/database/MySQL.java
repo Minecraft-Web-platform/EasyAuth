@@ -42,14 +42,18 @@ public class MySQL implements DbApi {
                 Statement createTableStatement = MySQLConnection.createStatement();
                 createTableStatement.executeUpdate(
                         String.format("""
-                                        CREATE TABLE `%s`.`%s` (
-                                            `id` INT NOT NULL AUTO_INCREMENT,
-                                            `username` VARCHAR(255) NOT NULL,
-                                            `username_lower` VARCHAR(255) NOT NULL,
-                                            `uuid` VARCHAR(255) NULL,
-                                            `data` JSON NOT NULL,
-                                            PRIMARY KEY (`id`), UNIQUE (`username`)
-                                        ) ENGINE = InnoDB;""",
+                                CREATE TABLE `%s`.`%s` (
+                                    `id` INT NOT NULL AUTO_INCREMENT,
+                                    `username` VARCHAR(255) NOT NULL,
+                                    `username_lower` VARCHAR(255) NOT NULL,
+                                    `uuid` VARCHAR(255) NULL,
+                                    `email` VARCHAR(255) NULL,
+                                    `emailIsConfirmed` BOOLEAN NOT NULL DEFAULT FALSE,
+                                    `data` JSON NOT NULL,
+                                    PRIMARY KEY (`id`), 
+                                    UNIQUE (`username`)
+                                ) ENGINE = InnoDB;
+                            """,
                                 config.mysql.mysqlDatabase,
                                 config.mysql.mysqlTable
                         )

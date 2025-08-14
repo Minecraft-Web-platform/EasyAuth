@@ -25,6 +25,8 @@ public class PlayerEntryV1 {
 
     public String username;
     public String usernameLowerCase;
+    public String email;
+    public Boolean emailIsConfirmed;
     public UUID uuid = null;
 
     private List<ConfirmationCode> confirmationCodes = new ArrayList<>();
@@ -102,6 +104,8 @@ public class PlayerEntryV1 {
         this.username = username;
         this.usernameLowerCase = usernameLowerCase;
         this.uuid = uuid == null ? null : UUID.fromString(uuid);
+        this.email = entry.email == null ? null : entry.email.toLowerCase();
+        this.emailIsConfirmed = false;
 
         this.password = entry.password == null ? "" : entry.password;
         this.lastIp = entry.lastIp == null ? "" : entry.lastIp;
